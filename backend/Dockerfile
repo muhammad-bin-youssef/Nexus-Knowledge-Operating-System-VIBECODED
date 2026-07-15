@@ -1,15 +1,8 @@
-FROM rust:1.75 AS builder
+FROM rust:latest AS builder
 
 WORKDIR /usr/src/kos-backend
 
-COPY Cargo.toml .
-COPY Cargo.lock .
-
-RUN mkdir -p src && echo 'fn main() { println!("dummy"); }' > src/main.rs
-RUN cargo build --release
-
 COPY . .
-RUN rm -f src/main.rs
 RUN cargo build --release
 
 FROM debian:bookworm-slim

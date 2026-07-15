@@ -106,6 +106,18 @@ This starts both services and publishes:
 
 The frontend is configured to proxy `/api` to the backend container automatically.
 
+### Use prebuilt images
+
+If you have precompiled images available, set these environment variables before starting:
+
+```bash
+export BACKEND_IMAGE=username/kos-backend:latest
+export FRONTEND_IMAGE=username/kos-frontend:latest
+docker compose up
+```
+
+If no prebuilt image is specified, Docker Compose will build locally from the repository.
+
 ### Override backend port
 
 ```bash
@@ -114,7 +126,7 @@ KOS_PORT=3002 docker compose up --build
 
 ### Persistent data
 
-A local `./data` directory is mounted into the backend container so the SQLite database persists across restarts.
+A local `./data` directory is mounted into the backend container so the SQLite SQLite database persists across restarts.
 
 ## Cross-Platform Notes
 
