@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight, Shield, ShieldOff } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchGraph } from '../api/client'
 import { useAppStore, selectSelectedNode } from '../store/appStore'
-import { formatNodeType, nodeTypeColor } from '../lib/graphUtils'
+import { formatNodeType, nodeTypeColor, nodeTypeDescription } from '../lib/graphUtils'
 
 export function Inspector() {
   const collapsed = useAppStore((s) => s.inspectorCollapsed)
@@ -44,8 +44,8 @@ export function Inspector() {
 
       <div className="flex-1 overflow-y-auto p-4">
         {selectedNode ? (
-          <div className="space-y-4">
-            <div>
+          <div className="space-y-5">
+            <div className="rounded-2xl bg-[#13161f] border border-[#2a3042] p-4">
               <div
                 className="inline-block text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded"
                 style={{
@@ -55,70 +55,90 @@ export function Inspector() {
               >
                 {formatNodeType(selectedNode.node_type)}
               </div>
-              <h2 className="text-lg font-semibold mt-2">{selectedNode.label}</h2>
+              <h2 className="text-xl font-semibold mt-3">{selectedNode.label}</h2>
+              <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+                {nodeTypeDescription(selectedNode.node_type)}
+              </p>
             </div>
 
-            <div className="flex items-center gap-2 text-sm">
-              {selectedNode.verified ? (
-                <>
-                  <Shield size={14} className="text-emerald-400" />
-                  <span className="text-emerald-400">Verified</span>
-                </>
-              ) : (
-                <>
-                  <ShieldOff size={14} className="text-amber-400" />
-                  <span className="text-amber-400">Unverified</span>
-                </>
-              )}
+            <div className="rounded-2xl bg-[#13161f] border border-[#2a3042] p-4">
+              <div className="flex items-center gap-2 text-sm">
+                {selectedNode.verified ? (
+                  <>
+                    <Shield size={14} className="text-emerald-400" />
+                    <span className="text-emerald-400">Verified</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldOff size={14} className="text-amber-400" />
+                    <span className="text-amber-400">Unverified</span>
+                  </>
+                )}
+              </div>
+
+              <div className="mt-4 grid gap-3 text-sm text-slate-300">
+                <div className="grid grid-cols-[110px_1fr] gap-2">
+                  <span className="text-slate-500">Node ID</span>
+                  <span className="break-all">{selectedNode.id}</span>
+                </div>
+                <div className="grid grid-cols-[110px_1fr] gap-2">
+                  <span className="text-slate-500">Type</span>
+                  <span>{formatNodeType(selectedNode.node_type)}</span>
+                </div>
+                <div className="grid grid-cols-[110px_1fr] gap-2">
+                  <span className="text-slate-500">Source</span>
+                  <span>{selectedNode.provenance.source_type}</span>
+                </div>
+                <div className="grid grid-cols-[110px_1fr] gap-2">
+                  <span className="text-slate-500">Created</span>
+                  <span>{new Date(selectedNode.created_at).toLocaleString()}</span>
+                </div>
+                <div className="grid grid-cols-[110px_1fr] gap-2">
+                  <span className="text-slate-500">Updated</span>
+                  <span>{new Date(selectedNode.updated_at).toLocaleString()}</span>
+                </div>
+              </div>
             </div>
 
             {selectedNode.content && (
-              <div>
-                <h3 className="text-[11px] uppercase tracking-wider text-slate-500 mb-1.5">
-                  Content
-                </h3>
-                <p className="text-sm text-slate-300 leading-relaxed">
+              <div className="rounded-2xl bg-[#13161f] border border-[#2a3042] p-4">
+                <div className="text-[11px] uppercase tracking-wider text-slate-500 mb-2">
+                  Full content
+                </div>
+                <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">
                   {selectedNode.content}
                 </p>
               </div>
             )}
 
-            <div>
-              <h3 className="text-[11px] uppercase tracking-wider text-slate-500 mb-1.5">
-                Provenance
-              </h3>
-              <dl className="text-sm space-y-1.5">
-                <div className="flex justify-between">
-                  <dt className="text-slate-500">Source</dt>
-                  <dd className="text-slate-300">{selectedNode.provenance.source_type}</dd>
+            <div className="rounded-2xl bg-[#13161f] border border-[#2a3042] p-4">
+              <div className="text-[11px] uppercase tracking-wider text-slate-500 mb-3">
+                Provenance & excerpt
+              </div>
+              <div className="grid gap-3 text-sm text-slate-300">
+                <div className="grid grid-cols-[110px_1fr] gap-2">
+                  <span className="text-slate-500">Source ID</span>
+                  <span className="break-all">{selectedNode.provenance.source_id}</span>
                 </div>
-                {selectedNode.provenance.excerpt && (
+                {selectedNode.provenance.excerpt ? (
                   <div>
-                    <dt className="text-slate-500 mb-0.5">Excerpt</dt>
-                    <dd className="text-slate-400 text-xs italic">
-                      "{selectedNode.provenance.excerpt}"
-                    </dd>
+                    <div className="text-slate-500 mb-1">Excerpt</div>
+                    <div className="rounded-xl bg-[#0f1117] border border-[#2a3042] p-3 text-slate-300 text-sm italic">
+                      “{selectedNode.provenance.excerpt}”
+                    </div>
                   </div>
+                ) : (
+                  <div className="text-slate-500">No excerpt available for this node.</div>
                 )}
-                <div className="grid grid-cols-2 gap-3 pt-2 text-[11px] text-slate-400">
-                  <div>
-                    <dt className="text-slate-500">Source ID</dt>
-                    <dd className="truncate">{selectedNode.provenance.source_id}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-slate-500">Created</dt>
-                    <dd>{new Date(selectedNode.created_at).toLocaleDateString()}</dd>
-                  </div>
-                </div>
-              </dl>
+              </div>
             </div>
 
             {graph && (
-              <div>
-                <h3 className="text-[11px] uppercase tracking-wider text-slate-500 mb-1.5">
+              <div className="rounded-2xl bg-[#13161f] border border-[#2a3042] p-4">
+                <div className="text-[11px] uppercase tracking-wider text-slate-500 mb-3">
                   Connections
-                </h3>
-                <ul className="text-sm space-y-1">
+                </div>
+                <ul className="space-y-2 text-sm">
                   {graph.edges
                     .filter(
                       (e) =>
@@ -132,17 +152,22 @@ export function Inspector() {
                       return (
                         <li
                           key={edge.id}
-                          className="flex items-center gap-2 text-slate-400"
+                          className="rounded-xl bg-[#0f1117] border border-[#2a3042] p-3"
                         >
-                          <span className="text-indigo-400">
-                            {isOutgoing ? '→' : '←'}
-                          </span>
-                          <span className="text-[11px] uppercase">
-                            {edge.edge_type.replace(/_/g, ' ')}
-                          </span>
-                          <span className="text-slate-300 truncate">
+                          <div className="flex items-center gap-2 text-slate-300 mb-1">
+                            <span className="text-indigo-400">{isOutgoing ? '→' : '←'}</span>
+                            <span className="text-[11px] uppercase text-slate-500">
+                              {edge.edge_type.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                          <div className="text-slate-100 font-medium truncate">
                             {other?.label ?? otherId}
-                          </span>
+                          </div>
+                          {edge.evidence && (
+                            <div className="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                              {edge.evidence}
+                            </div>
+                          )}
                         </li>
                       )
                     })}

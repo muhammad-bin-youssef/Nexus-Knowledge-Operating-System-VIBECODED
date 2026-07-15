@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchGraph } from '../api/client'
 import { useAppStore } from '../store/appStore'
 import { KosNode } from './nodes/KosNode'
-import { toFlowEdges, toFlowNodes } from '../lib/graphUtils'
+import { nodeTypeColor, toFlowEdges, toFlowNodes } from '../lib/graphUtils'
 
 const nodeTypes = { kos: KosNode }
 
@@ -106,7 +106,7 @@ export function GraphCanvas() {
       <MiniMap
         nodeColor={(n) => {
           const data = n.data as { nodeType?: string }
-          return data.nodeType === 'claim' ? '#f59e0b' : '#6366f1'
+          return nodeTypeColor(data.nodeType ?? 'custom')
         }}
         maskColor="rgba(15, 17, 23, 0.8)"
         className="!bg-[#161922] !border-[#2a3042]"
